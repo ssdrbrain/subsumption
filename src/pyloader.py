@@ -1,6 +1,4 @@
 
-import core.cmdman
-
 class PyLoader:
     def __init__(self):
         pass

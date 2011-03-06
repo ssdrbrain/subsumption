@@ -16,16 +16,19 @@ class ComponentManager:
 
     def add_loader(self, loader, prefix=''):
         # TODO: make this better
+        assert(prefix not in self.loaders)
         self.loaders[prefix] = loader
 
-    def remove_loader(self, loader):
-        # TODO: implement this
-        pass
+    def remove_loader(self, loader, prefix=''):
+        # TODO: make this better
+        assert(prefix in self.loaders)
+        assert(self.loaders[prefix] == loader)
+        del self.loaders[prefix]
 
     def _get_component_class(self, component_name):
         # TODO: error checking
         split_name = component_name.split(' ', 1)
-        if len(split_name):
+        if len(split_name) == 1:
             loader_name = ''
         else:
             loader_name = split_name[0]
@@ -35,7 +38,6 @@ class ComponentManager:
         return loader.get_component_class(component_name)
 
     def _load_global_instance(self, component_class):
-        print("loading " + str(component_class))
         component_info = component_class.component_info
         
         # collect the needed interfaces
@@ -77,7 +79,6 @@ class ComponentManager:
             self.instance_data_handlers[name][0](instance, data)
         
         # run all the func data through handlers
-        print(component_info['ext_func'].items())
         for name, funcs in component_info['ext_func'].items():
             for func, data in funcs:
                 self.func_data_handlers[name][0](instance, func.__get__(instance), data)

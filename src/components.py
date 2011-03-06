@@ -90,10 +90,10 @@ def interface_function(interface=None):
     """Decorator for adding a function to a registered interface."""
     return _general_function_decorator('int_func', 'interface_function', interface, chain_data=True)
 
-def uses_global_interface(name, int_func_name=None):
+def uses_global_interface(name, internal_name=None):
     """Decorator for using a global interface."""
-    if not int_func_name:
-        int_func_name = name
+    if not internal_name:
+        internal_name = name
     def decorator(cls):
         _general_component_decorator('int_comp', 'uses_global_interface', name, chain_data=True)(cls)
         try:
@@ -102,8 +102,8 @@ def uses_global_interface(name, int_func_name=None):
             old_init = None
         def new_init(self, *args, **interfaces):
             assert(name in interfaces)
-            assert(int_func_name not in cls.__dict__)
-            self.__dict__[int_func_name] = interfaces[name]
+            assert(internal_name not in cls.__dict__)
+            self.__dict__[internal_name] = interfaces[name]
             del interfaces[name]
             if old_init:
                 old_init.__get__(self)(*args, **interfaces)
