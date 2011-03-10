@@ -83,20 +83,20 @@ def component_decorator(name, data, chain_data=False):
     component_instance_data_load function."""
     return _general_component_decorator('ext_comp', name, data, chain_data)
 
-def zone_interface(name):
+def reg_interface(name):
     """Decorator for registering a zone interface."""
-    return _general_component_decorator('int_comp', 'zone_interface', name, chain_data=True)
+    return _general_component_decorator('int_comp', 'interface', name, chain_data=True)
 
 def interface_function(interface=None):
     """Decorator for adding a function to a registered interface."""
     return _general_function_decorator('int_func', 'interface_function', interface, chain_data=True)
 
-def uses_zone_interface(name, internal_name=None):
-    """Decorator for using a zone interface."""
+def uses_interface(name, internal_name=None):
+    """Decorator for using an interface."""
     if not internal_name:
         internal_name = name
     def decorator(cls):
-        _general_component_decorator('int_comp', 'uses_zone_interface', name, chain_data=True)(cls)
+        _general_component_decorator('int_comp', 'uses_interface', name, chain_data=True)(cls)
         try:
             old_init = cls.__init__
         except AttributeError:

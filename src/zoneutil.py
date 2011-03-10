@@ -28,8 +28,10 @@ class PlayerManager:
     def __iter__(self):
         return self.players.__iter__()
 
-class ChainedMapping(collections.MutableMapping):
-    def __init__(self, primary, *args):
+class _ChainedMapping(collections.MutableMapping):
+    def __init__(self, parent, key, primary, *args):
+        self.parent = parent
+        self.key = key
         self.primary = primary
         self.dict = dict()
         for d in reversed(args):
@@ -52,7 +54,13 @@ class ChainedMapping(collections.MutableMapping):
         return self.primary.__setitem__(key, value)
     
     def __delitem__(self, key):
-        return self.primary.__delitem__(key)
+        retval = self.primary.__delitem__(key)
+        
+        #check for empty and notify the parent ZoneMapping
+        if not len(self.primary):
+            self.parent._empty(self.key)
+
+        return retval
 
 class ZoneMapping:
     def __init__(self):
@@ -61,19 +69,34 @@ class ZoneMapping:
         self._arena = {}
         self._game = {}
 
+    def _empty(self, key):
+        if isinstance(key, zone.Game):
+            del self._game[key]
+        elif isinstance(key, zone.Arena):
+            del self._arena[key]
+        elif isinstance(key, zone.Realm):
+            del self._realm[key]
+        elif isinstance(key, zone.Zone) or key is None:
+            pass # nothing in _top_level to remove
+        else:
+            raise TypeError("Key not a zone.py type ({})".format(type(key).__name__))
+
     def __getitem__(self, key):            
         if isinstance(key, zone.Game):
-            return ChainedMapping(self._game.setdefault(key, {}),
+            return _ChainedMapping(self, key,
+                                   self._game.setdefault(key, {}),
                                    self._realm.get(key.realm, {}),
                                    self._top_level)
         elif isinstance(key, zone.Arena):
-            return ChainedMapping(self._arena.setdefault(key, {}),
+            return _ChainedMapping(self, key,
+                                   self._arena.setdefault(key, {}),
                                    self._realm.get(key.realm, {}),
                                    self._top_level)
         elif isinstance(key, zone.Realm):
-            return ChainedMapping(self._realm.setdefault(key, {}),
+            return _ChainedMapping(self, key,
+                                   self._realm.setdefault(key, {}),
                                    self._top_level)
         elif isinstance(key, zone.Zone) or key is None:
-            return ChainedMapping(self._top_level)
+            return _ChainedMapping(self, key, self._top_level)
         else:
-            raise TypeError("Key not a zone.py type")
+            raise TypeError("Key not a zone.py type ({})".format(type(key).__name__))

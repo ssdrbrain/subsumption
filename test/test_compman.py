@@ -25,7 +25,7 @@ class Test(unittest.TestCase):
         self.assertIn(("<test>",my_loader), self.component_manager.loaders.items())
         
         # test that the loader gets called properly
-        self.component_manager.load_list(["<test> component"])
+        self.component_manager.load_list(["<test> component"], None)
         self.assertTrue(my_loader.called)
         self.assertEqual(my_loader.component_name, "component")
 

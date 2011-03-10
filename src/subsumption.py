@@ -11,6 +11,6 @@ if __name__ == '__main__':
 
     # read components.conf
     component_list = conf.ListConfigFile('conf/components.conf')
-    component_manager.load_list(component_list)
-    cmdman = component_manager.interfaces['cmdman']
+    component_manager.load_list(component_list, None)
+    cmdman = component_manager.interfaces[None]['cmdman']
     cmdman.do_command("test", "params", "p", None)

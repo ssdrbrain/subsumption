@@ -9,8 +9,8 @@ def arena_command(cmd_name, group=None):
     return function_decorator('arena_command', data)
 
 @zone_component(author="Dr Brain")
-@zone_interface('cmdman')
-@uses_zone_interface('chat')
+@reg_interface('cmdman')
+@uses_interface('chat')
 class CommandManager:
     def __init__(self):
         self.zone_commands = {}

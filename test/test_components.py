@@ -63,8 +63,8 @@ class Test(unittest.TestCase):
 
     def test_uses_zone_interface(self):
         @zone_component()
-        @uses_zone_interface('a')
-        @uses_zone_interface('b', 'c')
+        @uses_interface('a')
+        @uses_interface('b', 'c')
         class TestComponent:
             def __init__(self):
                 self.initialized = True
