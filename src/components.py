@@ -18,12 +18,13 @@ def _get_component_info(cls):
         cls.component_info = component_info
     return component_info
 
-def _component_decorator(author, type):
+def _component_decorator(author, types):
     """This does the heavy lifting of component creation. It's called by the 
-    various decorators that create components (e.g. global_component)."""
+    various decorators that create components (e.g. zone_component)."""
     def decorator(cls):
         component_info = _get_component_info(cls)
-        component_info[type] = True
+        for type in types:
+            component_info[type] = True
         if author:
             component_info['author'] = author
 
@@ -42,9 +43,9 @@ def _component_decorator(author, type):
         return cls
     return decorator
 
-def global_component(author=None):
-    """Decorator for creating a component for loading at the global level."""
-    return _component_decorator(author, 'global')
+def zone_component(author=None):
+    """Decorator for creating a component for loading at the zone level."""
+    return _component_decorator(author, ['zone'])
 
 def _general_function_decorator(section, name, data, chain_data=False):
     """Decorator for adding to function_info[section][name]."""
@@ -82,20 +83,20 @@ def component_decorator(name, data, chain_data=False):
     component_instance_data_load function."""
     return _general_component_decorator('ext_comp', name, data, chain_data)
 
-def global_interface(name):
-    """Decorator for registering a global interface."""
-    return _general_component_decorator('int_comp', 'global_interface', name, chain_data=True)
+def zone_interface(name):
+    """Decorator for registering a zone interface."""
+    return _general_component_decorator('int_comp', 'zone_interface', name, chain_data=True)
 
 def interface_function(interface=None):
     """Decorator for adding a function to a registered interface."""
     return _general_function_decorator('int_func', 'interface_function', interface, chain_data=True)
 
-def uses_global_interface(name, internal_name=None):
-    """Decorator for using a global interface."""
+def uses_zone_interface(name, internal_name=None):
+    """Decorator for using a zone interface."""
     if not internal_name:
         internal_name = name
     def decorator(cls):
-        _general_component_decorator('int_comp', 'uses_global_interface', name, chain_data=True)(cls)
+        _general_component_decorator('int_comp', 'uses_zone_interface', name, chain_data=True)(cls)
         try:
             old_init = cls.__init__
         except AttributeError:

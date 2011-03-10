@@ -37,19 +37,19 @@ class ComponentManager:
         assert(loader is not None)
         return loader.get_component_class(component_name)
 
-    def _load_global_instance(self, component_class):
+    def _load_zone_instance(self, component_class):
         component_info = component_class.component_info
         
         # collect the needed interfaces
         needed_interfaces = {}
-        for interface in component_info['int_comp'].get('uses_global_interface', []):
+        for interface in component_info['int_comp'].get('uses_zone_interface', []):
             needed_interfaces[interface] = self.interfaces[interface]
         
         # instantiate it
         instance = component_class(**needed_interfaces)
         
         # register any interfaces
-        for interface in component_info['int_comp'].get('global_interface', []):
+        for interface in component_info['int_comp'].get('zone_interface', []):
             new_interface = Interface(interface)
             self.interfaces[interface] = new_interface
             for func, name in component_info['int_func'].get('interface_function', []):
@@ -104,11 +104,11 @@ class ComponentManager:
             # add it to unloaded_components 
             unloaded_components.append(component_class)
             
-            # make sure it's a global component
-            assert(component_info.get('global', False))
+            # make sure it's a zone component
+            assert(component_info.get('zone', False))
             
             # handle unloaded_interfaces
-            for interface in component_info['int_comp'].get('global_interface', []):
+            for interface in component_info['int_comp'].get('zone_interface', []):
                 assert(interface not in unloaded_interfaces)
                 assert(interface not in self.interfaces)
                 unloaded_interfaces[interface] = component_class
@@ -126,7 +126,7 @@ class ComponentManager:
                 unloaded_instance_data_handlers[name] = component_class
 
             # load interface dependencies
-            for interface in component_info['int_comp'].get('uses_global_interface', []):
+            for interface in component_info['int_comp'].get('uses_zone_interface', []):
                 interface_dependencies.setdefault(component_class, []).append(interface)
 
             for func_data_name in component_info['ext_func']:
@@ -158,13 +158,13 @@ class ComponentManager:
                 if instance_data_handler_dependencies.get(component_class, []):
                     continue
                 # no dependencies: load it
-                self._load_global_instance(component_class)
+                self._load_zone_instance(component_class)
                 component_info = component_class.component_info
                 
                 unloaded_components.remove(component_class)
                 
                 # remove interface dependencies
-                for interface in component_info['int_comp'].get('global_interface', []):
+                for interface in component_info['int_comp'].get('zone_interface', []):
                     del unloaded_interfaces[interface]
                     for interfaces in interface_dependencies.values():
                         while interface in interfaces:

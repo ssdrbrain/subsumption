@@ -1,7 +1,7 @@
 from components import *
 
-@global_component(author="Dr Brain")
-@global_interface("chat")
+@zone_component(author="Dr Brain")
+@zone_interface("chat")
 class Chat:
     def __init__(self):
         pass

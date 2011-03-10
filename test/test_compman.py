@@ -1,6 +1,6 @@
 import unittest
 import compman
-from components import global_component
+from components import zone_component
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -12,7 +12,7 @@ class Test(unittest.TestCase):
                 self.called = False
         
             def get_component_class(self, component_name):
-                @global_component()
+                @zone_component()
                 class TestClass:
                     pass
                 self.called = True
