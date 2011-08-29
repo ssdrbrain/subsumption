@@ -1,0 +1,46 @@
+Threading Model
+===============
+
+Introduction and Rationale
+--------------------------
+
+The threading model for ASSS is problematic for development. Access to an ASSS module interface or a module callback can realistically come from any thread. This is a huge problem for locking.
+
+Here I propose three possible strategies the Subsumption threading model. The primary goal of each of these is to eliminate the need for locking within a component (that does not create its own threads).
+
+Strategy one: Mainloop only
+---------------------------
+
+In this strategy, there is a single "official" thread for the entire zone. This would be modeled after the ASSS mainloop thread. This main thread is the only thread allowed to call into another component's public interface (functions, callbacks, etc).
+
+Components could run their own internal thread for processing, but these internal threads would not be allowed to call into other components directly. Their requests must be serialized into the execution flow of the main thread, through a queue or other thread safe message passing system. The core could provide utility functions for this. 
+
+For example, the net component would likely have its own thread (or threads) for processing incoming and outgoing packets. Packet handlers registered from other components would have to be called from the mainloop thread, though.
+
+Advantages: Extremely simple. There is little chance of confusion.
+
+Disadvantages: No scalability. A single thread cannot leverage the multitude of cores available on modern processors. A single slow function call can slow the response of the entire zone.
+
+Strategy two: Realm level processes
+-----------------------------------
+
+This option is to have each `Realm` in the server have its own process. A process allows parallelism with the python Global Interpreter Lock (GIL) being present.
+
+There would be a single zone level process, running the zone level components. It is worth noting at this point that most ASSS global modules would become `Realm` level components. Only a few, such as net and billing that deal with a single resource (e.g. a socket) that needs to be shared among the `Realm`s would remain at the zone level.
+
+Calls from a `Realm` component (in a `Realm` process) to a zone component (in the zone process) could be easily wrapped into a pipe or queue by some python magic in the zone component's public interface.
+
+Advantages: takes maximum advantage of multiple cores.
+
+Disadvantages: complicated inter-process communication is necessary. Some python niceties, like class level data is lost.
+
+Strategy three: Realm level threads
+-----------------------------------
+
+This strategy is a melding of the previous two. There is a single process for the entire zone, and `Realm`s have their own threads. 
+
+All calls in and out of a `Realm` level component happen in the `Realm` thread. Again, the interface for a zone level component can be wrapped by python magic for calling the function at a later time in the appropriate thread.
+
+Advantages: doesn't need complicated inter-process communication system. A slowly responding function in a single `Realm` won't adversely affect the responsiveness of the zone.
+
+Disadvantages: Won't take advantge of multiple cores due to the python GIL. Inter-realm communication within a class must be locked.

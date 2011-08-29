@@ -1,0 +1,63 @@
+Zone organization
+=================
+
+Introduction
+------------
+
+In ASSS the server is organized into only a few levels: `Zone`, `Arena`, `Player`. This has the advantage of being simple, and corresponding well to the SubSpace protocol. It is, however, not flexible enough for some of the more interesting game play models. Additionally, the omission of a team level causes some internal headaches, especially in freqman.
+
+Definitions and Structure
+-------------------------
+
+My proposed organizational levels are: `Zone`, `Realm`, `Arena`, `Game`, `Team`, `Player`.
+
+~~~~
+Zone
+~~~~
+
+There is a single `Zone` in the server. This encompasses everything in the server. A message sent to the `Zone` will reach every player connected to the server.
+
+~~~~~
+Realm
+~~~~~
+
+This takes the place of an ASSS arena in most normal respects. It contains zero or more `Arena`s and zero or more `Game`s. A `Realm` with `Player`s must contain at least one `Arena`, though. `Team`s are defined on a `Realm` level. Public chat reaches all `Player`s in the `Realm`. Team chat reaches all other `Player`s on the sending `Player`'s `Team`, regardless of `Arena`. `Player`s leaving one `Arena` for another within the same `Realm` do not appear to leave the player list to others in the `Realm`.
+
+~~~~~
+Arena
+~~~~~
+
+This is an arena in the SubSpace protocol sense. It represents a map which `Player`s can occupy and see each other on. Position packets are sent within an `Arena`. An `Arena` belongs to a single `Realm`.
+
+~~~~
+Game
+~~~~
+
+A `Game` is a scope for a game. These games can be the protocol defined games, like Flagging, Balling, and KotH. They can also be a built up game type provided by a server component, like a dueling, elim, or racing. A `Game` doesn't necessarily correspond to an `Arena`. One can imagine a `Game` spanning several `Arena`s, or a single `Arena` having multiple `Games`. A `Game` does belong to a single `Realm`, however.
+
+~~~~
+Team
+~~~~
+
+A `Team` is a collection of `Player`s. A `Player` can belong to only one `Team`. A `Team` has a corresponding unique SubSpace frequency. In ASSS no distiction is given between the terms team and frequency. Subsumption will, however, strive to distinguish these terms: a team is the collection of players, and a frequency is a number used to represent the collection (akin to an ID number). Consequently, only components dealing directly with the SubSpace protocol will use frequencies. All other components will deal with teams.
+
+~~~~~~
+Player
+~~~~~~
+
+A `Player` is a player in the SubSpace protocol sense of the term. It can be a human, a bot, or a server generated entity. As mentioned earlier `Player` belongs to a single `Team` and a single `Arena` (and consequently a single `Realm`). A `Player` may belong to multiple `Game`s (provided they're all within the `Player`'s `Realm`).
+
+
+Details on Realm and Arenas
+---------------------------
+
+Human players see a list of arenas (in the SS protocol sense) when they type ?arena. In SubSumption, these are really `Realm` entry points, and may have no relationship to an `Arena`. The `Realm` may generate as many or as few entry points as it needs. A simple `Realm` may contain only a single `Arena`, and have a single entry point leading to this `Arena. A big `Realm` might have an entry point for each of its `Arena`s. A quest style `Realm` might have only one or two entry points for its many `Arena`s. Since ?arena lists are generated on request, it will be possible for a sophistocated `Realm` to customize its entry points per player.
+
+A player can request a change of arena using ?go. The server tries to match this to a realm entry point, and if a match is found, the `Player` is assigned to the `Realm`, and the `Realm`'s entry point logic places the `Player` into one of its `Arena`s. This logic also places the player onto one of the `Realm`'s `Team`s. 
+
+SS clients send their desired arena as part of the connection process (this can be overridden by a component, if desired). This requested arena is treated like a ?go, and handled as described above.
+
+Game Usage
+----------
+
+The `Realm` need not define any `Game`s. It's simply a convenience grouping for components. It is useful because components can be attached to Games, and callbacks can be triggered on Games. The assignment of `Player`s to `Game`s is left to the components using those `Game`s.
