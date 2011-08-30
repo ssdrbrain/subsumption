@@ -1,0 +1,44 @@
+Components
+==========
+
+Introduction
+------------
+
+Components are the direct equivelent of ASSS modules. They have been renamed to avoid confusion with Python's modules (which are utilized within the server).
+
+Attach Scope
+------------
+
+Components can attach to the Zone (global), Realms, Arenas, and Games. I've decided not to allow attaching to Teams and Players, as I could not come up with a reasonable usage that wasn't better handled by one of the other scopes. This decision also side steps the potentially annoying issue of how to specify what components would attach to Teams and Players (Player level configuration files are not available).
+
+Attaching process
+-----------------
+
+Example: Arena creation
+
+From the perspective of the arena:
+Arena is created by core
+Config component loads arena config
+Core uses loaded config to determine attach list (a global list could be added to the arena list at this point)
+dependencies are resolved and components are instantiated and loaded in order (details later)
+Arena is ready.
+
+From the perspective of a single component:
+Component class is instantiated, and constructor is called. At this point, the requested interface variables exist in the instance (e.g. self.chat), but may not be valid.
+Component's load function is called, if one has been registered. All interfaces are valid.
+The component's decorated functions are passed to their controlling components for registration (e.g. @zone_command and cmdman).
+Component's attach function is called, if one has been registered. The component is fully attached.
+
+
+Example: Arena destruction
+
+From the perspective of the arena:
+Components are detached in the reverse order of their loading
+Arena is destroyed.
+
+From the perspective of a single component:
+Component's detach function is called, if one has been registered.
+The component's decorated functions are passed to their controlling components for unregistration.
+The component's unload function is called, if one has been registered. All iterfaces are valid.
+The component's instance is destroyed.
+
