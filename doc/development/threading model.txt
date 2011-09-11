@@ -44,3 +44,8 @@ All calls in and out of a `Realm` level component happen in the `Realm` thread. 
 Advantages: doesn't need complicated inter-process communication system. A slowly responding function in a single `Realm` won't adversely affect the responsiveness of the zone.
 
 Disadvantages: Won't take advantge of multiple cores due to the python GIL. Inter-realm communication within a class must be locked.
+
+Conclusion
+----------
+
+I don't believe that processes are worth the trouble. They do provide additional opportunity for parallelism, but in my experience SubSpace servers are IO bound and not CPU bound programs. The additional CPU access isn't likely to improve the responsiveness of the server.

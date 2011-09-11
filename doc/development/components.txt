@@ -9,7 +9,7 @@ Components are the direct equivelent of ASSS modules. They have been renamed to 
 Attach Scope
 ------------
 
-Components can attach to the Zone (global), Realms, Arenas, and Games. I've decided not to allow attaching to Teams and Players, as I could not come up with a reasonable usage that wasn't better handled by one of the other scopes. This decision also side steps the potentially annoying issue of how to specify what components would attach to Teams and Players (Player level configuration files are not available).
+Components can attach to the Zone (global), Realms, Arenas, and Games. I've decided not to allow attaching to Teams and Players, as I could not come up with a reasonable usage that wasn't better handled by one of the other scopes. This decision also side steps the potentially annoying issue of how to specify what components would attach to Teams and Players (.conf files are not available at these scopes).
 
 Attaching process
 -----------------
@@ -42,3 +42,9 @@ The component's decorated functions are passed to their controlling components f
 The component's unload function is called, if one has been registered. All iterfaces are valid.
 The component's instance is destroyed.
 
+Nicities
+--------
+
+A player enter callback is called for each player in the arena when the component is attached. The component should be able to disable this if desired, or have a way to tell that this is happenening so it can ignore it.
+
+The same thing happens when the component is detached: a player leave callback is triggered for every player still in the arena.

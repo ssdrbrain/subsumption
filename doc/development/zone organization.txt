@@ -11,37 +11,31 @@ Definitions and Structure
 
 My proposed organizational levels are: `Zone`, `Realm`, `Arena`, `Game`, `Team`, `Player`.
 
-~~~~
 Zone
 ~~~~
 
 There is a single `Zone` in the server. This encompasses everything in the server. A message sent to the `Zone` will reach every player connected to the server.
 
-~~~~~
 Realm
 ~~~~~
 
 This takes the place of an ASSS arena in most normal respects. It contains zero or more `Arena`s and zero or more `Game`s. A `Realm` with `Player`s must contain at least one `Arena`, though. `Team`s are defined on a `Realm` level. Public chat reaches all `Player`s in the `Realm`. Team chat reaches all other `Player`s on the sending `Player`'s `Team`, regardless of `Arena`. `Player`s leaving one `Arena` for another within the same `Realm` do not appear to leave the player list to others in the `Realm`.
 
-~~~~~
 Arena
 ~~~~~
 
 This is an arena in the SubSpace protocol sense. It represents a map which `Player`s can occupy and see each other on. Position packets are sent within an `Arena`. An `Arena` belongs to a single `Realm`.
 
-~~~~
 Game
 ~~~~
 
 A `Game` is a scope for a game. These games can be the protocol defined games, like Flagging, Balling, and KotH. They can also be a built up game type provided by a server component, like a dueling, elim, or racing. A `Game` doesn't necessarily correspond to an `Arena`. One can imagine a `Game` spanning several `Arena`s, or a single `Arena` having multiple `Games`. A `Game` does belong to a single `Realm`, however.
 
-~~~~
 Team
 ~~~~
 
 A `Team` is a collection of `Player`s. A `Player` can belong to only one `Team`. A `Team` has a corresponding unique SubSpace frequency. In ASSS no distiction is given between the terms team and frequency. Subsumption will, however, strive to distinguish these terms: a team is the collection of players, and a frequency is a number used to represent the collection (akin to an ID number). Consequently, only components dealing directly with the SubSpace protocol will use frequencies. All other components will deal with teams.
 
-~~~~~~
 Player
 ~~~~~~
 
