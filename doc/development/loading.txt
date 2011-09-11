@@ -1,0 +1,14 @@
+Loading Components
+==================
+
+Introduction
+------------
+
+Components are python classes with a special @decorator applied to their definition. 
+
+Uncategorized Ramblings
+-----------------------
+
+I need to explain the mess of the python loading struct, and how it gets built by decorators and iterated by compman.
+
+It may be nice to pass arguments to components. Additionally, a facility for renaming the component where it's possible to have duplicates might be a good idea. E.g. one could load a net component called 'primary' on port X and another called 'secondary' on port Y. This needs more thought. It may be a terrible idea :)

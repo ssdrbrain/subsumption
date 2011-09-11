@@ -1,0 +1,13 @@
+Error Checking
+==============
+
+Uncategorized Ramblings
+-----------------------
+
+Python's exception handling can be used to catch any normal programming errors that crop up in components. Setting this up is easy. The hard question is how to deal with the exception when it happens.
+
+One avenue of approach is to unload the offending component (and components that depend upon it, of course). It is likely that this will raise additional exceptions, and these should be dealt with appropraitely.
+
+Since there are some components that are so critical to zone functioning that it doesn't make sense to unload them, even if it is theoretically possible. These "core" components could be designated in a file, and any unload-worthy exception in these components would cause a server recycle instead.
+
+It may be possible to forgive certain exceptions, if they're not too frequent. E.g. more than 1 exception per second would cause an unload of the component (or a restart, if it's a core component). This is fraught with potential complications, and needs to be revisited when the core is further along.

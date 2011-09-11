@@ -1,0 +1,18 @@
+Player Class
+============
+
+Introduction
+------------
+
+ASSS has two problems prompting this redesign in subsumption: the lack of fake player integration, and a lack of protocol extensibility. 
+
+Fake players aren't well integrated into the core, and special checks abound in many, many modules (even modules which do not utilize fake players). Conceptually though, there's little difference between a server controlled player and an actual player. Only the lack of some function calls into the controlling module prevent "full citizenship" for these players.
+
+It is virtually impossible to seperate a player from the SS protocol in ASSS. This isn't surprising, though, as tight integration with packets was one of the design goals of ASSS. It lends itself routing packets using the minimum of CPU time, but hampers the introduction of clients using different (or even modified) clients.
+
+With these things in mind, I think polymorphism is the exactly perfect solution. This is the sort of problem that polymorphism was designed to solve.
+
+The Player Class in Subsumption
+-------------------------------
+
+... Stuff needs to go here.
