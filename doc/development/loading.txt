@@ -4,7 +4,14 @@ Loading Components
 Introduction
 ------------
 
-Components are python classes with a special @decorator applied to their definition. 
+Components are python classes with a special @decorator applied to their definition.
+
+Interfaces
+----------
+
+A component can register an interface for other components to utilize, and assign various functions to be exposed in the interface. Compman creates a python object for the interface, and populates it with the desired functions from the instance. This prevents a different component from going crazy with a class instance.
+
+This building of the interface by compman may be useful, as intermediate functions can be placed in the interface that can perform various functions, such as debugging, logging, removal of return values, exceptions on calling across threading boundaries, or other misc. useful things. 
 
 Uncategorized Ramblings
 -----------------------

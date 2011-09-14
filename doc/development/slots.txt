@@ -6,18 +6,18 @@ Idea contributed by Cerium (Ceiu)
 Introduction
 ------------
 
-As explained to me, by Ceiu, slots are buckets on a team that can be occupied by players. A slot stores information, such as deaths. A player gets their slot back if they disconnect and come back. This is useful for a team duel style arena, where you want to track kills and deaths for each player on the team, but you don't really care who the player of the moment is.
+As explained to me, by Ceiu, slots are buckets on a team that can be occupied by players. A slot stores information, such as deaths. A player gets their slot back if they disconnect and come back. This is useful for a team duel style arena, where you want to track kills and deaths for each player on the team, but you don't really care who the player of the moment is. Though it is advisable to reuse a player's last slot if they rejoin (after a lag-out or similar).
 
 Place in the Zone Hierarchy
 ---------------------------
 
 I don't see that Slots need to exist in the core, as part of each Team. There's no advantage to having it be a permanent part of the hierarchy. There is, however, a need for a utility with the same functionality that can be utilized by components when they need it.
 
-I propose a component that can generate managed Slots for components that want them. A 4v4 team elim module would ask for 4 slots on the two teams, and the slot managing component would fill and empty them as players come and go. The module could store its own data on each of the slots, such as kills and deaths. It would assign players to the slots as they join the game, using a least recently used replacement scheme.
+I propose a component that can generate managed Slots for components that want them. A 4v4 team elim component would ask for 4 slots on the two teams, and the slot managing component would fill and empty them as players come and go. The component could store its own data on each of the slots, such as kills and deaths. It would assign players to the slots as they join the game, using a least recently used replacement scheme.
 
 Extensions
 ----------
 
-One could use a variable number of slots on the team. The slot manager could use a variable list to hold this, returning the entire list for the utilizing component to peruse. As more players join, the list would grow. The list would never shrink while the game was going on. The module could request that the slots be reset at the end of the game, purging the empty ones.
+One could use a variable number of slots on the team. The slot manager could use a variable list to hold this, returning the entire list for the utilizing component to peruse. In this situation empty slots would not be reused. As more players join, the list would grow. The list would never shrink while the game was going on. The component could request that the slots be reset at the end of the game, purging the empty ones.
 
 In this manner, end of game stats could be reported, even on players that have left the zone.

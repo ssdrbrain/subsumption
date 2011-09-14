@@ -15,4 +15,14 @@ With these things in mind, I think polymorphism is the exactly perfect solution.
 The Player Class in Subsumption
 -------------------------------
 
-... Stuff needs to go here.
+All player instances would extend from a Player class, and override the send_* methods defined in Player. These functions would handle all s2c traffic. Examples of these functions might be p.send_position_packet(...), p.send_chat_message(...), p.send_brick(...), p.send_ship_change(...), etc. Continuum and VIE clients would use these functions to formulate the SS protocol S2C packets, and forward them to the net_udp component. Chatnet clients would use these functions to create the chatnet protocol strings and forward them to the net_tcp component. Fake/Server-side players would implement them them as they see fit.
+
+The Protocol Component
+----------------------
+
+First off, this needs a better name. Protocol is confusing, as it's protocol agnostic. Protocol gateway might be more specific, but ideally the name should be much shorter than that.
+
+For C2S packets some other scheme must be devised. The simplest is to have a protocol component that accepts all c2s traffic in a protocol independent manner. For example, it might have functions like protocol.got_position_packet(p, ...), protocol.got_chat_message(p, ...), protocol.got_brick(p, ...), p.got_ship_change(...). Interested components would register with the protocol component to recieve notifications. As an example, the chat component would register for the chat messages.
+
+In this way, protocol handlers (e.g. VIE) would only need to create Player objects when appropriate with the appropriate methods for handling s2c, and pass the c2s packets directly to the protocol component. Similarly, component using a server controlled player would only have to pass the appropriate requests to protocol for things like chat or position packets.
+
