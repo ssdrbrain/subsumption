@@ -1,11 +1,78 @@
 Commands
 ========
 
-Uncategorized Ramblings
------------------------
+Scope and Targets
+-----------------
 
-I think 99% of commands should be realm-local.
+Commands are registered at the attach scope of the registering component. A command registered by a component attached to a realm is available within the realm. A command registered by a component attached to a Game is available within the game.
 
-The remainder are special cross-realm private commands. They can be specially registered.
+Some examples of scoping:
 
-A command can be registered to a specific cmd char (e.g. * or ?). The cmdman checks the dict cmds tied to a specific char first, then checks the general cmd dict. If both of these fail, a catch all is called (possibly allow registering a char specific catch all?).
+@command(..., source_in_scope=True, target_in_scope=True) # both the sending player and the target (player or team) must be within the component attach scope. This is the default.
+@command(..., source_in_scope=True, target_in_scope=False) # The sending player must be within the component attach scope. The target may be anywhere in the zone.
+@command(..., source_in_scope=True, target_in_scope=False) # The sending player may be anywhere in the zone. The target must be within the attach scope
+@command(..., source_in_scope=False, target_in_scope=False) # illegal, will raise an exception
+
+Targets are the player/freq/public that the command is directed toward. Targets can be disabled by the @command decorator, removing the need for checks within the function.
+
+Some examples of targets:
+@command(..., target_pub=True) # allow the 'public' form of the command. The target passed to the command will be the component's attach scope.
+@command(..., target_pub=False) # disallow 'public' form of the command.
+@command(..., target_team=True) # allow the local team to be a target for this command.
+@command(..., target_team=False) # disallow local team targets.
+@command(..., target_remote_team=True) # allow remote team targets.
+@command(..., target_remote_team=False) # disallow remote team targets.
+@command(..., target_player=True) # allow player targets. No distiction is made between local players and players in a different realm.
+@command(..., target_player=False) # disallow player targets
+@command(..., target_external=True) # Allow remote commands to players not in the zone. There is no guarantee made that this player is online, or even that the player exists, or that the player name is legal. This should be used with extreme care. This cannot be used in conjuction with target_in_scope=True, or an exception will be raised.
+@command(..., target_external=False) # disallow external targets
+Note: specifying a command with no allowable targets will raise an exception
+
+Command Groups and Access
+-------------------------
+
+Command groups are a way to give a command a default access level. For example, the moderator group might allow access to the 'default' command group and to the 'mod' command group. Then any commands registering themselves in either of these groups is available to players in the moderator group. Individual commands within an available command groups can be explititly denied, if need arises. Conversely, access to individual commands in an unavailable command group can be granted.
+
+In addition to granting and denying the command in general, different forms of the command (i.e. with different targets) can be individually denied and granted for a player group.
+
+A command can register itself to a command group for all forms (i.e. targets), or register different groups for different forms. This is useful for a command like ?scorereset, where the public target should be available to the default player group, and other targets should be limitited to higher player groups.
+
+Access is considered in this order: 
+* If a player's group has been explicitly denial that exact form of the command, then access is denied.
+* If a player's group has been explicitly granted acess to that exact form of the command, access is granted.
+* If a player's group has been denied the command in general, then access is denied.
+* If a player's group has been granted access to the command in general, then access is granted
+* If a player's group has access to the containing command group, access is granted.
+* If a player's group has the all-access priveledge, access is granted.
+* Access is denied.
+
+An example is warranted. Let's consider the 'usage' command, allowing only public and player targets. It registers itself (under all targets) to the 'default' command group. Let us assume that both the default and the moderator player groups accept the default command group. It may be desirable to restrict normal players to only viewing their own usage (through ?usage), and allow moderators the private form (/?usage). To do this, one would explititly grant the public form and deny the general form to the default player group. Then, in the moderator group, allow the general form of the command (this step is only necessary if the moderator player group inherits from the default player group).
+
+Command Names
+-------------
+
+If a name is specified in the @command decorator, it is honored. If it is not, a name is derrived directly from the function's name. This helps reduce redundancy in the coding process, without removing flexability.
+
+The name conversion goes something like this:
+* all characters become lower case
+* a leading cmd_ is removed, if it is present.
+* all special characters like '_' are removed.
+
+With these rules, cmd_specall would become 'specall', score_reset would become 'scorereset'
+
+Command Help
+------------
+
+Just like in ASSS's pymod, the function's docstring should be used for the ?man/?help. This is far more convenient than passing it as part of the @command decorator.
+
+Command Listing
+---------------
+
+Perhaps command groups can be used to create some organization for a command listing? Along with the first line of their docstring, perhaps. Is this part of the PEP on docstrings? I know matlab has something like this.
+
+Misc
+----
+
+A command can be registered to a specific cmd char (e.g. * or ?). The cmdman checks the dict cmds tied to a specific char first, then checks the general cmd dict. If both of these fail, a catch all is called (possibly allow registering a char specific catch all?). I haven't thought about how this may conflict with the access specification. For now I'll just assume that it can be resolved nicely in the player group specification syntax, whenever that gets created.
+
+Stealth commands give no hint of their existence. Instead of reporting to the player that they don't have the capability to execute this command, the unknown command behavior is used (e.g. command is ignored).
