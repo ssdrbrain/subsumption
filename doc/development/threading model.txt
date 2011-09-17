@@ -6,7 +6,9 @@ Introduction and Rationale
 
 The threading model for ASSS is problematic for development. Access to an ASSS module interface or a module callback can realistically come from any thread. This is a huge problem for locking.
 
-Here I propose three possible strategies the Subsumption threading model. The primary goal of each of these is to eliminate the need for locking within a component (that does not create its own threads).
+Here I propose three possible strategies the Subsumption threading model. The primary goal of each of these is to eliminate the need for locking within a component (at least one within one that does not create its own threads).
+
+None of these threading models have any bearing on running multiple zones on a single host. The process (or groups of processes) will not interact with the processes from other zones.
 
 Strategy one: Mainloop only
 ---------------------------
@@ -50,4 +52,4 @@ Conclusion
 
 I don't believe that processes are worth the trouble. They do provide additional opportunity for parallelism, but in my experience SubSpace servers are IO bound and not CPU bound programs. The additional CPU access isn't likely to improve the responsiveness of the server. The same argument may be used to a lesser extent against the realm level threading. 
 
-The only remaining "problem" is a slow arena causing trouble for the entire zone. This appears only rarely in ASSS, and can always be attributed to a poorly written module. With this in mind, the simplest threading model is probably the best solution.
+The only remaining "problem" is a slow arena causing trouble for the entire zone. This appears only rarely in ASSS, and can always be attributed to a poorly written module (that should be doing its computations in a worker thread instead). With this in mind, the simplest threading model is probably the best solution.

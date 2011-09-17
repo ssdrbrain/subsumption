@@ -76,3 +76,5 @@ Misc
 A command can be registered to a specific cmd char (e.g. * or ?). The cmdman checks the dict cmds tied to a specific char first, then checks the general cmd dict. If both of these fail, a catch all is called (possibly allow registering a char specific catch all?). I haven't thought about how this may conflict with the access specification. For now I'll just assume that it can be resolved nicely in the player group specification syntax, whenever that gets created.
 
 Stealth commands give no hint of their existence. Instead of reporting to the player that they don't have the capability to execute this command, the unknown command behavior is used (e.g. command is ignored).
+
+The command system should be divorced from the chat system as much as possible. To this end, a command handler should be passed a stream like object which they can pass messages to the originating player (and perhaps the command's target, too). This object would do the translaction back to chat for the time being, but could be easily modified to a dedicated command protocol in the future.
